@@ -1,0 +1,45 @@
+<h1>PyChat</h1>
+<div id="message_wrapper" style="overflow-y:scroll; height:400px; width:800px; border-style: solid;"></div>
+<input type="text" id="message" placeholder="Type your message here">
+<input type="submit" onclick="sendMessage()" id="message_submit">
+<br>
+<input type="text" id="name" placeholder="Please enter your name">
+<input type="submit" onclick="setName()" id="set_name">
+
+<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.6/socket.io.min.js"></script>
+<script type="text/javascript" src="//code.jquery.com/jquery-1.4.2.min.js"></script>
+<script type="text/javascript" charset="utf-8">
+	var name;
+	var v = $("#set_name");
+	var w = $("#name");
+	var x = $("#message_wrapper");
+	var y = $("#message");
+	var z = $("#message_submit");
+	x.hide();
+	y.hide();
+	z.hide();
+	setName = function() {
+		if ($("#name").val().split(" ").join("") !== "") {
+			name = $("#name").val()
+			x.show();
+			y.show();
+			z.show();
+			w.hide();
+			v.hide();
+		}
+	}
+	var socket = io.connect('http://' + document.domain + ':' + location.port);
+	$('#message').keypress(function (e) {
+		if (e.which == 13) {
+			sendMessage();
+			return false;
+		}
+	});
+	sendMessage = function() {
+		socket.emit('send_message', {message: $('#message').val(), name: name});
+	}
+	socket.on('message', function(msg) {
+		$('#message_wrapper').append('<p><b>' + msg.name + "</b>: " + msg.message + '</p>');
+	});
+	
+</script>
